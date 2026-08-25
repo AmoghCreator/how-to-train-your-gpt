@@ -17,13 +17,13 @@ Training neural networks involves millions of **identical, independent math oper
 
 **Do you absolutely need a GPU?** No — our tiny test model will run on CPU, just very slowly (minutes vs hours). For real training, a GPU is essential.
 
-| Your Hardware | What You Can Train | Approximate Speed |
-|---|---|---|
-| CPU only | Tiny model (4 layers, 256 dims) | Hours |
-| Apple M1/M2/M3 | Small model (12 layers, 768 dims) | Hours |
-| RTX 3060/4060 (12GB) | GPT-2 small (124M params) | Few hours |
-| RTX 3090/4090 (24GB) | GPT-2 medium (350M) | Few hours |
-| A100 (80GB) | GPT-2 large (774M) | Hours |
+| Your Hardware        | What You Can Train                | Approximate Speed |
+| -------------------- | --------------------------------- | ----------------- |
+| CPU only             | Tiny model (4 layers, 256 dims)   | Hours             |
+| Apple M1/M2/M3       | Small model (12 layers, 768 dims) | Hours             |
+| RTX 3060/4060 (12GB) | GPT-2 small (124M params)         | Few hours         |
+| RTX 3090/4090 (24GB) | GPT-2 medium (350M)               | Few hours         |
+| A100 (80GB)          | GPT-2 large (774M)                | Hours             |
 
 ### "What is a virtual environment?"
 
@@ -50,13 +50,13 @@ gpt_env\Scripts\activate             # Windows
 
 PyTorch is the framework we'll use to build our neural network. It provides:
 
-| PyTorch Feature | What It Does | Analogy |
-|---|---|---|
-| `torch.Tensor` | Multi-dimensional arrays | Like NumPy arrays, but can live on GPU |
-| `torch.nn.Module` | Building blocks for networks | LEGO pieces you snap together |
-| `torch.optim` | Algorithms that update weights | The "learning" part of machine learning |
-| `autograd` | Automatic gradient calculation | Does calculus for you automatically |
-| `DataLoader` | Feeds data efficiently | A conveyor belt delivering training data |
+| PyTorch Feature   | What It Does                   | Analogy                                  |
+| ----------------- | ------------------------------ | ---------------------------------------- |
+| `torch.Tensor`    | Multi-dimensional arrays       | Like NumPy arrays, but can live on GPU   |
+| `torch.nn.Module` | Building blocks for networks   | LEGO pieces you snap together            |
+| `torch.optim`     | Algorithms that update weights | The "learning" part of machine learning  |
+| `autograd`        | Automatic gradient calculation | Does calculus for you automatically      |
+| `DataLoader`      | Feeds data efficiently         | A conveyor belt delivering training data |
 
 ## Installation — Step by Step
 
@@ -90,16 +90,16 @@ python -c "import torch; print(f'PyTorch {torch.__version__}'); print(f'CUDA ava
 
 ## What Each Library Does (In Detail)
 
-| Library | What It Does | Why We Need It |
-|---|---|---|
-| **torch** | Core PyTorch: tensors, GPU ops, autograd | The foundation — everything else builds on this |
-| **tiktoken** | Fast BPE tokenizer from OpenAI | Same tokenizer GPT-3.5/4 use. Written in Rust, extremely fast |
-| **datasets** (HuggingFace) | Downloads + caches training data | Saves us from manually downloading and parsing Wikipedia |
-| **numpy** | Fast numerical arrays on CPU | For quick data manipulation (though PyTorch handles most) |
-| **matplotlib** | Creates charts and graphs | To visualize our training loss — is the model learning? |
-| **math** (built-in) | sqrt, sin, cos, pi | Mathematical constants for positional encoding |
-| **time** (built-in) | Measure elapsed time | Track training speed in tokens/second |
-| **os** (built-in) | Create directories, save files | Save model checkpoints so we don't lose progress |
+| Library                    | What It Does                             | Why We Need It                                                |
+| -------------------------- | ---------------------------------------- | ------------------------------------------------------------- |
+| **torch**                  | Core PyTorch: tensors, GPU ops, autograd | The foundation — everything else builds on this               |
+| **tiktoken**               | Fast BPE tokenizer from OpenAI           | Same tokenizer GPT-3.5/4 use. Written in Rust, extremely fast |
+| **datasets** (HuggingFace) | Downloads + caches training data         | Saves us from manually downloading and parsing Wikipedia      |
+| **numpy**                  | Fast numerical arrays on CPU             | For quick data manipulation (though PyTorch handles most)     |
+| **matplotlib**             | Creates charts and graphs                | To visualize our training loss — is the model learning?       |
+| **math** (built-in)        | sqrt, sin, cos, pi                       | Mathematical constants for positional encoding                |
+| **time** (built-in)        | Measure elapsed time                     | Track training speed in tokens/second                         |
+| **os** (built-in)          | Create directories, save files           | Save model checkpoints so we don't lose progress              |
 
 ## Our Complete Import Block
 
@@ -151,10 +151,11 @@ print(f"PyTorch version: {torch.__version__}")
 print(f"CUDA available:  {torch.cuda.is_available()}")
 if torch.cuda.is_available():
     print(f"GPU:             {torch.cuda.get_device_name(0)}")
-    print(f"GPU Memory:      {torch.cuda.get_device_properties(0).total_mem / 1e9:.1f} GB")
+    print(f"GPU Memory:      {torch.cuda.get_device_properties(0).total_memory / 1e9:.1f} GB")
 ```
 
 **Expected output (with GPU):**
+
 ```
 All imports ready!
 PyTorch version: 2.1.0
@@ -164,6 +165,7 @@ GPU Memory:      24.0 GB
 ```
 
 **Expected output (CPU only):**
+
 ```
 All imports ready!
 PyTorch version: 2.1.0
@@ -187,5 +189,5 @@ If you ever feel lost, go back to the analogy. If the code feels overwhelming, f
 
 ---
 
-**Previous:** [Chapter 0 — Overview](00_overview.md)
+**Previous:** [Chapter 0 — Overview](00_overview.md)  
 **Next:** [Chapter 2 — Tokenization](02_tokenization.md)
