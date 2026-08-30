@@ -192,13 +192,8 @@ class GPT(nn.Module):
             logits: [batch, seq_len, vocab_size] — raw prediction scores
             loss:   scalar — cross-entropy (None if targets not provided)
 
-        The Shift-by-One Trick:
-            Input:  [The,  cat,  sat,  on,   the,  mat]
-                     ↓     ↓     ↓     ↓     ↓     ↓
-            Target: [cat,  sat,  on,   the,  mat,  ?]
-            Predict: P(cat|The) P(sat|The,cat) ... P(mat|The,cat,sat,on,the)
-
-The dataset already provides shifted targets so we compute loss on all positions.
+        The dataset already provides shifted targets, so we compute the
+        loss on all positions directly (no manual slicing needed).
         """
         batch_size, seq_len = input_ids.shape
 
@@ -236,49 +231,16 @@ The dataset already provides shifted targets so we compute loss on all positions
         # ===== 6. COMPUTE LOSS (training only) =====
         loss = None
         if targets is not None:
-            # WHAT: Align predictions with targets using shift-by-one
-            #
-            # logits[:, :-1, :]:  predictions for positions 0..seq-2
-            # targets[:, 1:]:      true tokens for positions 1..seq-1
-            #
-            #          Position:  0      1      2      3
-            #          Input:     The    cat    sat    on
-            #          Target:    cat    sat    on     the
-            #          Logits:   P(cat) P(sat) P(on)  P(the)
-            #                                        ^
-            #                                   We drop this
-            #                                   (no target for it)
+            # WHAT: Flatten logits and targets, then compute cross-entropy.
+            # WHY: The dataset already provides shifted targets, so we
+            #      compute the loss on all positions directly.
             logits_flat = logits.contiguous().view(
                 -1, self.config.vocab_size
             )
-            targets_flat = targets.contiguous().view(
-                -1
-            )
-                cumulative_probs = torch.cumsum(
-                    F.softmax(sorted_logits, dim=-1), dim=-1
-                )
-                # Remove tokens after cumulative probability exceeds top_p
-                sorted_indices_to_remove = cumulative_probs > top_p
-                # Shift right: always keep the first token
-                sorted_indices_to_remove[:, 1:] = (
-                    sorted_indices_to_remove[:, :-1].clone()
-                )
-                sorted_indices_to_remove[:, 0] = False
-                # Scatter back to original order
-                indices_to_remove = sorted_indices_to_remove.scatter(
-                    1, sorted_indices, sorted_indices_to_remove
-                )
-                logits[indices_to_remove] = float('-inf')
+            targets_flat = targets.contiguous().view(-1)
+            loss = F.cross_entropy(logits_flat, targets_flat)
 
-            # ===== SAMPLE NEXT TOKEN =====
-            # WHAT: Convert logits → probabilities → pick one token
-            probs = F.softmax(logits, dim=-1)
-            next_token = torch.multinomial(probs, num_samples=1)
-
-            # ===== APPEND TO SEQUENCE =====
-            input_ids = torch.cat([input_ids, next_token], dim=1)
-
-        return input_ids
+        return logits, loss
 ```
 
 ## nn.Parameter vs register_buffer vs regular attribute
